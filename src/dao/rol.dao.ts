@@ -16,7 +16,13 @@ export const getAllRoles = async () => {
   const { data, error } = await supabase
     .from('Rol')
     .select('*');
-  if (error) throw error;
+
+  console.log('🔍 Supabase query result:', { data, error });
+
+  if (error) {
+    console.error('❌ Supabase error:', error);
+    throw error;
+  }
   return data;
 };
 

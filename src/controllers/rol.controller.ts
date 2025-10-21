@@ -14,6 +14,8 @@ export const addRol = async (req: Request, res: Response) => {
 export const listRoles = async (req: Request, res: Response) => {
   try {
     const roles = await getAllRoles();
+    console.log('Roles obtenidos de la BD:', roles);
+    console.log('Cantidad de roles:', roles?.length || 0);
     res.json(roles);
   } catch (err: any) {
     console.error(err);

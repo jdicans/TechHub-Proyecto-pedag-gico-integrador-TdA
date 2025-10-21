@@ -16,6 +16,8 @@ exports.addRol = addRol;
 const listRoles = async (req, res) => {
     try {
         const roles = await (0, rol_dao_1.getAllRoles)();
+        console.log('Roles obtenidos de la BD:', roles);
+        console.log('Cantidad de roles:', roles?.length || 0);
         res.json(roles);
     }
     catch (err) {

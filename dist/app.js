@@ -39,43 +39,64 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const dotenv = __importStar(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
-const helmet_1 = __importDefault(require("helmet"));
-const db_1 = require("./config/db");
 const rol_routes_1 = __importDefault(require("./routes/rol.routes"));
+const usuario_routes_1 = __importDefault(require("./routes/usuario.routes"));
+const categoria_routes_1 = __importDefault(require("./routes/categoria.routes"));
+const etiqueta_routes_1 = __importDefault(require("./routes/etiqueta.routes"));
+const publicacion_routes_1 = __importDefault(require("./routes/publicacion.routes"));
+const comentario_routes_1 = __importDefault(require("./routes/comentario.routes"));
+const archivo_routes_1 = __importDefault(require("./routes/archivo.routes"));
+const grupoEstudio_routes_1 = __importDefault(require("./routes/grupoEstudio.routes"));
+const evento_routes_1 = __importDefault(require("./routes/evento.routes"));
+const notificacion_routes_1 = __importDefault(require("./routes/notificacion.routes"));
+const reporte_routes_1 = __importDefault(require("./routes/reporte.routes"));
 const swagger_ui_express_1 = __importDefault(require("swagger-ui-express"));
 const swagger_1 = __importDefault(require("./docs/swagger"));
 dotenv.config();
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
-app.use((0, helmet_1.default)());
+// Global request/response logger for debugging
+app.use((req, res, next) => {
+    const start = Date.now();
+    console.log(`${new Date().toISOString()} --> ${req.method} ${req.originalUrl}`);
+    res.on('finish', () => {
+        const ms = Date.now() - start;
+        console.log(`${new Date().toISOString()} <-- ${req.method} ${req.originalUrl} ${res.statusCode} ${ms}ms`);
+    });
+    next();
+});
+// Diagnostic ping endpoint (bypass routers) to verify server responsiveness
+app.get('/ping', (_req, res) => res.status(200).json({ ok: true }));
 app.use(express_1.default.json());
+app.use(express_1.default.urlencoded({ extended: true }));
+app.use((0, cors_1.default)());
+//app.use(helmet());
 // Rutas de la API
 app.use('/api/roles', rol_routes_1.default);
-// Ruta base (para probar servidor y conexión)
-app.get('/', async (req, res) => {
-    try {
-        // Hacemos una pequeña query para comprobar conexión con Supabase
-        const { data, error } = await db_1.supabase.from('Rol').select('*').limit(1);
-        if (error) {
-            console.error('Error al conectar con Supabase:', error.message);
-            return res.status(500).json({ message: 'Error al conectar con la base de datos' });
-        }
-        res.json({
-            message: 'Servidor TechHub corriendo correctamente',
-            dbStatus: 'Conexión exitosa a Supabase',
-            exampleData: data,
-        });
-    }
-    catch (err) {
-        console.error('Error inesperado al probar la conexión:', err);
-        res.status(500).json({ message: 'Error inesperado al conectar con la base de datos' });
-    }
-});
+app.use('/api/usuarios', usuario_routes_1.default);
+app.use('/api/categorias', categoria_routes_1.default);
+app.use('/api/etiquetas', etiqueta_routes_1.default);
+app.use('/api/publicaciones', publicacion_routes_1.default);
+app.use('/api/comentarios', comentario_routes_1.default);
+app.use('/api/archivos', archivo_routes_1.default);
+app.use('/api/grupos', grupoEstudio_routes_1.default);
+app.use('/api/eventos', evento_routes_1.default);
+app.use('/api/notificaciones', notificacion_routes_1.default);
+app.use('/api/reportes', reporte_routes_1.default);
 // Swagger UI (montar antes de arrancar el servidor)
+// Log headers specifically for docs route to help debug 403 issues
+app.use('/api/docs', (req, _res, next) => {
+    console.log('--- /api/docs request ---');
+    console.log('method:', req.method);
+    console.log('url:', req.originalUrl);
+    console.log('headers:', req.headers);
+    next();
+});
 app.use('/api/docs', swagger_ui_express_1.default.serve, swagger_ui_express_1.default.setup(swagger_1.default));
+// Diagnostic endpoint: return the raw swagger JSON
+app.get('/api/docs/json', (_req, res) => res.json(swagger_1.default));
 // Levantar servidor (único listen)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+    console.log(`Escuchando el puerto ${PORT}`);
 });
 exports.default = app;

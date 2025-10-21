@@ -18,8 +18,11 @@ const getAllRoles = async () => {
     const { data, error } = await db_1.supabase
         .from('Rol')
         .select('*');
-    if (error)
+    console.log('🔍 Supabase query result:', { data, error });
+    if (error) {
+        console.error('❌ Supabase error:', error);
         throw error;
+    }
     return data;
 };
 exports.getAllRoles = getAllRoles;
