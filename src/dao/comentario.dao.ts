@@ -28,7 +28,7 @@ export const getAllComentarios = async (): Promise<ComentarioConRelaciones[]> =>
     .from('Comentario')
     .select(`
       *,
-      usuario:Usuario!Comentario_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil)
+      usuario:Usuario!fk_comentario_usuario(id_usuario, nombre, apellido, foto_perfil)
     `)
     .order('fecha', { ascending: false });
 
@@ -44,7 +44,7 @@ export const getComentarioById = async (id_comentario: number): Promise<Comentar
     .from('Comentario')
     .select(`
       *,
-      usuario:Usuario!Comentario_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil)
+      usuario:Usuario!fk_comentario_usuario(id_usuario, nombre, apellido, foto_perfil)
     `)
     .eq('id_comentario', id_comentario)
     .single();
@@ -61,7 +61,7 @@ export const getComentariosByPublicacion = async (id_publicacion: number): Promi
     .from('Comentario')
     .select(`
       *,
-      usuario:Usuario!Comentario_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil)
+      usuario:Usuario!fk_comentario_usuario(id_usuario, nombre, apellido, foto_perfil)
     `)
     .eq('id_publicacion', id_publicacion)
     .order('fecha', { ascending: true }); // Orden cronológico para comentarios
@@ -78,7 +78,7 @@ export const getComentariosByUsuario = async (id_usuario: number): Promise<Comen
     .from('Comentario')
     .select(`
       *,
-      usuario:Usuario!Comentario_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil)
+      usuario:Usuario!fk_comentario_usuario(id_usuario, nombre, apellido, foto_perfil)
     `)
     .eq('id_usuario', id_usuario)
     .order('fecha', { ascending: false });
