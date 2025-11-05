@@ -33,9 +33,17 @@ app.use((req, res, next) => {
 });
 // Diagnostic ping endpoint (bypass routers) to verify server responsiveness
 app.get('/ping', (_req, res) => res.status(200).json({ ok: true }));
+
+// Configuración de CORS - Permitir todos los orígenes
+app.use(cors({
+  origin: '*',
+  credentials: false,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
 //app.use(helmet());
 
 
