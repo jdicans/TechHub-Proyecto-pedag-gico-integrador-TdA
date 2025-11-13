@@ -1,0 +1,161 @@
+## base de datos SQL SERVER
+
+- - =========================================================
+-- SCRIPT DE CREACIÓN DE BASE DE DATOS: TechHub (SQL Server)
+-- =========================================================
+
+CREATE DATABASE TechHub;
+GO
+USE TechHub;
+GO
+
+- - ============================
+-- TABLAS BASE
+-- ============================
+
+CREATE TABLE Rol (
+id_rol INT IDENTITY(1,1) PRIMARY KEY,
+nombre NVARCHAR(50) NOT NULL,
+descripcion NVARCHAR(MAX)
+);
+
+CREATE TABLE Usuario (
+id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+nombre NVARCHAR(100) NOT NULL,
+apellido NVARCHAR(100) NOT NULL,
+cedula NVARCHAR(20) UNIQUE,
+telefono NVARCHAR(20),
+correo NVARCHAR(150) UNIQUE NOT NULL,
+contrasena NVARCHAR(255) NOT NULL,
+carrera NVARCHAR(100),
+foto_perfil NVARCHAR(255),
+fecha_registro DATETIME2 DEFAULT SYSDATETIME(),
+id_rol INT,
+CONSTRAINT FK_Usuario_Rol FOREIGN KEY (id_rol) REFERENCES Rol(id_rol) ON DELETE SET NULL
+);
+
+CREATE TABLE GrupoEstudio (
+id_grupo INT IDENTITY(1,1) PRIMARY KEY,
+nombre NVARCHAR(100) NOT NULL,
+descripcion NVARCHAR(MAX),
+fecha_creacion DATETIME2 DEFAULT SYSDATETIME()
+);
+
+CREATE TABLE Categoria (
+id_categoria INT IDENTITY(1,1) PRIMARY KEY,
+nombre NVARCHAR(100) NOT NULL,
+descripcion NVARCHAR(MAX)
+);
+
+CREATE TABLE Etiqueta (
+id_etiqueta INT IDENTITY(1,1) PRIMARY KEY,
+nombre NVARCHAR(100) UNIQUE NOT NULL
+);
+
+- - ============================
+-- PUBLICACIONES Y CONTENIDO
+-- ============================
+
+CREATE TABLE Publicacion (
+id_publicacion INT IDENTITY(1,1) PRIMARY KEY,
+titulo NVARCHAR(200) NOT NULL,
+contenido NVARCHAR(MAX),
+fecha_creacion DATETIME2 DEFAULT SYSDATETIME(),
+id_usuario INT,
+id_categoria INT,
+tipo NVARCHAR(50),
+CONSTRAINT FK_Publicacion_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+CONSTRAINT FK_Publicacion_Categoria FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria) ON DELETE SET NULL
+);
+
+CREATE TABLE PublicacionEtiqueta (
+id_publicacion INT NOT NULL,
+id_etiqueta INT NOT NULL,
+PRIMARY KEY (id_publicacion, id_etiqueta),
+CONSTRAINT FK_PubEtq_Publicacion FOREIGN KEY (id_publicacion) REFERENCES Publicacion(id_publicacion) ON DELETE CASCADE,
+CONSTRAINT FK_PubEtq_Etiqueta FOREIGN KEY (id_etiqueta) REFERENCES Etiqueta(id_etiqueta) ON DELETE CASCADE
+);
+
+CREATE TABLE Comentario (
+id_comentario INT IDENTITY(1,1) PRIMARY KEY,
+contenido NVARCHAR(MAX) NOT NULL,
+fecha DATETIME2 DEFAULT SYSDATETIME(),
+id_usuario INT,
+id_publicacion INT,
+CONSTRAINT FK_Comentario_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE,
+CONSTRAINT FK_Comentario_Publicacion FOREIGN KEY (id_publicacion) REFERENCES Publicacion(id_publicacion) ON DELETE CASCADE
+);
+
+CREATE TABLE Archivo (
+id_archivo INT IDENTITY(1,1) PRIMARY KEY,
+nombre NVARCHAR(200) NOT NULL,
+tipo NVARCHAR(50),
+ruta NVARCHAR(255),
+tamanio INT,
+fecha_subida DATETIME2 DEFAULT SYSDATETIME(),
+id_publicacion INT,
+CONSTRAINT FK_Archivo_Publicacion FOREIGN KEY (id_publicacion) REFERENCES Publicacion(id_publicacion) ON DELETE CASCADE
+);
+
+- - ============================
+-- EVENTOS Y RELACIONES
+-- ============================
+
+CREATE TABLE Evento (
+id_evento INT IDENTITY(1,1) PRIMARY KEY,
+nombre NVARCHAR(150) NOT NULL,
+descripcion NVARCHAR(MAX),
+fecha_evento DATE,
+hora_evento TIME,
+lugar NVARCHAR(150),
+modalidad NVARCHAR(50),
+id_categoria INT,
+CONSTRAINT FK_Evento_Categoria FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria) ON DELETE SET NULL
+);
+
+CREATE TABLE InscripcionEvento (
+id_inscripcion INT IDENTITY(1,1) PRIMARY KEY,
+id_evento INT,
+id_usuario INT,
+fecha_inscripcion DATETIME2 DEFAULT SYSDATETIME(),
+CONSTRAINT FK_Inscripcion_Evento FOREIGN KEY (id_evento) REFERENCES Evento(id_evento) ON DELETE CASCADE,
+CONSTRAINT FK_Inscripcion_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE
+);
+
+- - ============================
+-- GRUPOS Y PARTICIPANTES
+-- ============================
+
+CREATE TABLE GrupoUsuario (
+id_grupo INT NOT NULL,
+id_usuario INT NOT NULL,
+rol_grupo NVARCHAR(50),
+fecha_union DATETIME2 DEFAULT SYSDATETIME(),
+PRIMARY KEY (id_grupo, id_usuario),
+CONSTRAINT FK_GrupoUsuario_Grupo FOREIGN KEY (id_grupo) REFERENCES GrupoEstudio(id_grupo) ON DELETE CASCADE,
+CONSTRAINT FK_GrupoUsuario_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE
+);
+
+- - ============================
+-- NOTIFICACIONES Y REPORTES
+-- ============================
+
+CREATE TABLE Notificacion (
+id_notificacion INT IDENTITY(1,1) PRIMARY KEY,
+mensaje NVARCHAR(MAX) NOT NULL,
+tipo NVARCHAR(50),
+fecha DATETIME2 DEFAULT SYSDATETIME(),
+leida BIT DEFAULT 0,
+id_usuario INT,
+CONSTRAINT FK_Notificacion_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario) ON DELETE CASCADE
+);
+
+CREATE TABLE Reporte (
+id_reporte INT IDENTITY(1,1) PRIMARY KEY,
+tipo NVARCHAR(100),
+descripcion NVARCHAR(MAX),
+fecha_creacion DATETIME2 DEFAULT SYSDATETIME(),
+generado_por INT,
+CONSTRAINT FK_Reporte_Usuario FOREIGN KEY (generado_por) REFERENCES Usuario(id_usuario) ON DELETE SET NULL
+);
+GO

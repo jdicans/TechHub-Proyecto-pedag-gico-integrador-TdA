@@ -1,0 +1,151 @@
+## base de datos PostgreSQL
+
+- - ============================
+-- CREACIÓN DE TABLAS BASE
+-- ============================
+
+CREATE TABLE "Rol" (
+"id_rol" SERIAL PRIMARY KEY,
+"nombre" VARCHAR(50) NOT NULL,
+"descripcion" TEXT
+);
+
+CREATE TABLE "Usuario" (
+"id_usuario" SERIAL PRIMARY KEY,
+"nombre" VARCHAR(100) NOT NULL,
+"apellido" VARCHAR(100) NOT NULL,
+"cedula" VARCHAR(20) UNIQUE,
+"telefono" VARCHAR(20),
+"correo" VARCHAR(150) UNIQUE NOT NULL,
+"contrasena" VARCHAR(255) NOT NULL,
+"carrera" VARCHAR(100),
+"foto_perfil" VARCHAR(255),
+"fecha_registro" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+"id_rol" INT,
+CONSTRAINT fk_usuario_rol FOREIGN KEY ("id_rol") REFERENCES "Rol" ("id_rol") ON DELETE SET NULL
+);
+
+CREATE TABLE "GrupoEstudio" (
+"id_grupo" SERIAL PRIMARY KEY,
+"nombre" VARCHAR(100) NOT NULL,
+"descripcion" TEXT,
+"fecha_creacion" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE "Categoria" (
+"id_categoria" SERIAL PRIMARY KEY,
+"nombre" VARCHAR(100) NOT NULL,
+"descripcion" TEXT
+);
+
+CREATE TABLE "Etiqueta" (
+"id_etiqueta" SERIAL PRIMARY KEY,
+"nombre" VARCHAR(100) UNIQUE NOT NULL
+);
+
+- - ============================
+-- CONTENIDO Y RELACIONES
+-- ============================
+
+CREATE TABLE "Publicacion" (
+"id_publicacion" SERIAL PRIMARY KEY,
+"titulo" VARCHAR(200) NOT NULL,
+"contenido" TEXT,
+"fecha_creacion" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+"id_usuario" INT,
+"id_categoria" INT,
+"tipo" VARCHAR(50),
+CONSTRAINT fk_publicacion_usuario FOREIGN KEY ("id_usuario") REFERENCES "Usuario" ("id_usuario") ON DELETE CASCADE,
+CONSTRAINT fk_publicacion_categoria FOREIGN KEY ("id_categoria") REFERENCES "Categoria" ("id_categoria") ON DELETE SET NULL
+);
+
+CREATE TABLE "PublicacionEtiqueta" (
+"id_publicacion" INT,
+"id_etiqueta" INT,
+PRIMARY KEY ("id_publicacion", "id_etiqueta"),
+CONSTRAINT fk_pubetq_publicacion FOREIGN KEY ("id_publicacion") REFERENCES "Publicacion" ("id_publicacion") ON DELETE CASCADE,
+CONSTRAINT fk_pubetq_etiqueta FOREIGN KEY ("id_etiqueta") REFERENCES "Etiqueta" ("id_etiqueta") ON DELETE CASCADE
+);
+
+CREATE TABLE "Comentario" (
+"id_comentario" SERIAL PRIMARY KEY,
+"contenido" TEXT NOT NULL,
+"fecha" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+"id_usuario" INT,
+"id_publicacion" INT,
+CONSTRAINT fk_comentario_usuario FOREIGN KEY ("id_usuario") REFERENCES "Usuario" ("id_usuario") ON DELETE CASCADE,
+CONSTRAINT fk_comentario_publicacion FOREIGN KEY ("id_publicacion") REFERENCES "Publicacion" ("id_publicacion") ON DELETE CASCADE
+);
+
+CREATE TABLE "Archivo" (
+"id_archivo" SERIAL PRIMARY KEY,
+"nombre" VARCHAR(200) NOT NULL,
+"tipo" VARCHAR(50),
+"ruta" VARCHAR(255),
+"tamanio" INT,
+"fecha_subida" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+"id_publicacion" INT,
+CONSTRAINT fk_archivo_publicacion FOREIGN KEY ("id_publicacion") REFERENCES "Publicacion" ("id_publicacion") ON DELETE CASCADE
+);
+
+- - ============================
+-- EVENTOS Y RELACIONES
+-- ============================
+
+CREATE TABLE "Evento" (
+"id_evento" SERIAL PRIMARY KEY,
+"nombre" VARCHAR(150) NOT NULL,
+"descripcion" TEXT,
+"fecha_evento" DATE,
+"hora_evento" TIME,
+"lugar" VARCHAR(150),
+"modalidad" VARCHAR(50),
+"id_categoria" INT,
+CONSTRAINT fk_evento_categoria FOREIGN KEY ("id_categoria") REFERENCES "Categoria" ("id_categoria") ON DELETE SET NULL
+);
+
+CREATE TABLE "InscripcionEvento" (
+"id_inscripcion" SERIAL PRIMARY KEY,
+"id_evento" INT,
+"id_usuario" INT,
+"fecha_inscripcion" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+CONSTRAINT fk_inscripcion_evento FOREIGN KEY ("id_evento") REFERENCES "Evento" ("id_evento") ON DELETE CASCADE,
+CONSTRAINT fk_inscripcion_usuario FOREIGN KEY ("id_usuario") REFERENCES "Usuario" ("id_usuario") ON DELETE CASCADE
+);
+
+- - ============================
+-- GRUPOS Y PARTICIPANTES
+-- ============================
+
+CREATE TABLE "GrupoUsuario" (
+"id_grupo" INT,
+"id_usuario" INT,
+"rol_grupo" VARCHAR(50),
+"fecha_union" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY ("id_grupo", "id_usuario"),
+CONSTRAINT fk_grupousuario_grupo FOREIGN KEY ("id_grupo") REFERENCES "GrupoEstudio" ("id_grupo") ON DELETE CASCADE,
+CONSTRAINT fk_grupousuario_usuario FOREIGN KEY ("id_usuario") REFERENCES "Usuario" ("id_usuario") ON DELETE CASCADE
+);
+
+- - ============================
+-- NOTIFICACIONES Y REPORTES
+-- ============================
+
+CREATE TABLE "Notificacion" (
+"id_notificacion" SERIAL PRIMARY KEY,
+"mensaje" TEXT NOT NULL,
+"tipo" VARCHAR(50),
+"fecha" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+"leida" BOOLEAN DEFAULT FALSE,
+"id_usuario" INT,
+CONSTRAINT fk_notificacion_usuario FOREIGN KEY ("id_usuario") REFERENCES "Usuario" ("id_usuario") ON DELETE CASCADE
+);
+
+CREATE TABLE "Reporte" (
+"id_reporte" SERIAL PRIMARY KEY,
+"tipo" VARCHAR(100),
+"descripcion" TEXT,
+"fecha_creacion" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+"generado_por" INT,
+CONSTRAINT fk_reporte_usuario FOREIGN KEY ("generado_por") REFERENCES "Usuario" ("id_usuario") ON DELETE SET NULL
+);
