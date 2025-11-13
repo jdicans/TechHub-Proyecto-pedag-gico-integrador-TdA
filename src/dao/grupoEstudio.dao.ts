@@ -210,7 +210,7 @@ export const getMiembrosByGrupo = async (id_grupo: number): Promise<any[]> => {
     .select(`
       rol_grupo,
       fecha_union,
-      usuario:Usuario!GrupoUsuario_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil)
+      usuario:Usuario!fk_grupousuario_usuario(id_usuario, nombre, apellido, foto_perfil)
     `)
     .eq('id_grupo', id_grupo)
     .order('fecha_union', { ascending: true });

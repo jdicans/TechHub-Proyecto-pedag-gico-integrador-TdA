@@ -28,8 +28,8 @@ export const getAllPublicaciones = async (): Promise<PublicacionConRelaciones[]>
     .from('Publicacion')
     .select(`
       *,
-      usuario:Usuario!Publicacion_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil),
-      categoria:Categoria!Publicacion_id_categoria_fkey(id_categoria, nombre)
+      usuario:Usuario!fk_publicacion_usuario(id_usuario, nombre, apellido, foto_perfil),
+      categoria:Categoria!fk_publicacion_categoria(id_categoria, nombre)
     `)
     .order('fecha_creacion', { ascending: false });
 
@@ -57,8 +57,8 @@ export const getPublicacionById = async (id_publicacion: number): Promise<Public
     .from('Publicacion')
     .select(`
       *,
-      usuario:Usuario!Publicacion_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil),
-      categoria:Categoria!Publicacion_id_categoria_fkey(id_categoria, nombre)
+      usuario:Usuario!fk_publicacion_usuario(id_usuario, nombre, apellido, foto_perfil),
+      categoria:Categoria!fk_publicacion_categoria(id_categoria, nombre)
     `)
     .eq('id_publicacion', id_publicacion)
     .single();
@@ -83,8 +83,8 @@ export const getPublicacionesByUsuario = async (id_usuario: number): Promise<Pub
     .from('Publicacion')
     .select(`
       *,
-      usuario:Usuario!Publicacion_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil),
-      categoria:Categoria!Publicacion_id_categoria_fkey(id_categoria, nombre)
+      usuario:Usuario!fk_publicacion_usuario(id_usuario, nombre, apellido, foto_perfil),
+      categoria:Categoria!fk_publicacion_categoria(id_categoria, nombre)
     `)
     .eq('id_usuario', id_usuario)
     .order('fecha_creacion', { ascending: false });
@@ -112,8 +112,8 @@ export const getPublicacionesByCategoria = async (id_categoria: number): Promise
     .from('Publicacion')
     .select(`
       *,
-      usuario:Usuario!Publicacion_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil),
-      categoria:Categoria!Publicacion_id_categoria_fkey(id_categoria, nombre)
+      usuario:Usuario!fk_publicacion_usuario(id_usuario, nombre, apellido, foto_perfil),
+      categoria:Categoria!fk_publicacion_categoria(id_categoria, nombre)
     `)
     .eq('id_categoria', id_categoria)
     .order('fecha_creacion', { ascending: false });
@@ -217,7 +217,7 @@ export const deleteAllEtiquetasFromPublicacion = async (id_publicacion: number):
 export const getEtiquetasByPublicacion = async (id_publicacion: number): Promise<any[]> => {
   const { data, error } = await supabase
     .from('PublicacionEtiqueta')
-    .select('etiqueta:Etiqueta!PublicacionEtiqueta_id_etiqueta_fkey(id_etiqueta, nombre)')
+    .select('etiqueta:Etiqueta!fk_pubetq_etiqueta(id_etiqueta, nombre)')
     .eq('id_publicacion', id_publicacion);
 
   if (error) throw error;

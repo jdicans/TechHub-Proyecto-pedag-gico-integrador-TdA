@@ -23,7 +23,7 @@ export const getAllEventos = async (): Promise<EventoConRelaciones[]> => {
     .from('Evento')
     .select(`
       *,
-      categoria:Categoria!Evento_id_categoria_fkey(id_categoria, nombre)
+      categoria:Categoria!fk_evento_categoria(id_categoria, nombre)
     `)
     .order('fecha_evento', { ascending: true });
 
@@ -52,7 +52,7 @@ export const getEventoById = async (id_evento: number): Promise<EventoConRelacio
     .from('Evento')
     .select(`
       *,
-      categoria:Categoria!Evento_id_categoria_fkey(id_categoria, nombre)
+      categoria:Categoria!fk_evento_categoria(id_categoria, nombre)
     `)
     .eq('id_evento', id_evento)
     .single();
@@ -78,7 +78,7 @@ export const getEventosByCategoria = async (id_categoria: number): Promise<Event
     .from('Evento')
     .select(`
       *,
-      categoria:Categoria!Evento_id_categoria_fkey(id_categoria, nombre)
+      categoria:Categoria!fk_evento_categoria(id_categoria, nombre)
     `)
     .eq('id_categoria', id_categoria)
     .order('fecha_evento', { ascending: true });
@@ -107,7 +107,7 @@ export const getEventosByModalidad = async (modalidad: string): Promise<EventoCo
     .from('Evento')
     .select(`
       *,
-      categoria:Categoria!Evento_id_categoria_fkey(id_categoria, nombre)
+      categoria:Categoria!fk_evento_categoria(id_categoria, nombre)
     `)
     .eq('modalidad', modalidad)
     .order('fecha_evento', { ascending: true });
@@ -138,7 +138,7 @@ export const getEventosProximos = async (): Promise<EventoConRelaciones[]> => {
     .from('Evento')
     .select(`
       *,
-      categoria:Categoria!Evento_id_categoria_fkey(id_categoria, nombre)
+      categoria:Categoria!fk_evento_categoria(id_categoria, nombre)
     `)
     .gte('fecha_evento', fechaActual)
     .order('fecha_evento', { ascending: true });
@@ -257,7 +257,7 @@ export const getInscritosByEvento = async (id_evento: number): Promise<any[]> =>
     .from('InscripcionEvento')
     .select(`
       fecha_inscripcion,
-      usuario:Usuario!InscripcionEvento_id_usuario_fkey(id_usuario, nombre, apellido, foto_perfil)
+      usuario:Usuario!fk_inscripcion_usuario(id_usuario, nombre, apellido, foto_perfil)
     `)
     .eq('id_evento', id_evento)
     .order('fecha_inscripcion', { ascending: true });
@@ -292,7 +292,7 @@ export const getEventosByUsuario = async (id_usuario: number): Promise<EventoCon
     .from('Evento')
     .select(`
       *,
-      categoria:Categoria!Evento_id_categoria_fkey(id_categoria, nombre)
+      categoria:Categoria!fk_evento_categoria(id_categoria, nombre)
     `)
     .in('id_evento', eventoIds)
     .order('fecha_evento', { ascending: true });

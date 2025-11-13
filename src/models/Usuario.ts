@@ -19,7 +19,7 @@ export interface LoginRequest {
   contrasena: string;
 }
 
-export interface RegisterRequest {
+export interface RegisterRequest { 
   nombre: string;
   apellido: string;
   cedula: string;
